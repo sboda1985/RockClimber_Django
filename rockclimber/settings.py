@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 import os
 import keyring
 import getpass
+from secret_settings import *
+
 database_name = 'RockClimber'
 username = 'RockClimber'
 password = keyring.get_password(database_name, username)
@@ -29,7 +31,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'cd(oi$kwbt_q=c*cgdj46he10-p-bxa=jmq+ghxu!%+u)$-h0p'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
