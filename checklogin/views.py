@@ -2,12 +2,14 @@ from django.http import HttpResponse
 from django.db import connection
 from django.http import JsonResponse
 import hashlib
+import traceback
 import sys
 from django.views.decorators.csrf import csrf_exempt
 import json
 import time
 
 def get_client_ip(request):
+    ip = '0.0.0.0'
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
     if x_forwarded_for:
         ip = x_forwarded_for.split(',')[0]
@@ -23,8 +25,8 @@ def index(request):
         with connection.cursor() as cursor:
             try:
                 today = time.strftime("%Y-%m-%d")	
-                email = request.POST['email']
-                cursor.execute("SELECT ID FROM users WHERE email = %s ", email) 
+                email = str(request.POST['email'])
+                cursor.execute("SELECT ID FROM users WHERE email = %s ", [email]) 
                 id = cursor.fetchone()
                 cursor.execute("""SELECT COUNT(*) FROM failed_login_attempts WHERE IP = %s AND failed_time = %s""", (ip, today))
                 failed_attempts = cursor.fetchone()
@@ -34,13 +36,14 @@ def index(request):
                 cursor.execute("SELECT salt FROM users_password WHERE ID = %s", id)
                 salt = cursor.fetchone()
                 password = request.POST['password']
-                #salt need conversion, it is a unicode tuple 
-                typedhashpassword = hashlib.sha512(password + map(str, salt)[0]).hexdigest()
+                #salt need conversion, it is a unicode tuple
+                h_password = str(password) + salt[0]  
+                typedhashpassword = hashlib.sha512(h_password.encode()).hexdigest()
                 cursor.execute("SELECT password FROM users_password WHERE ID = %s", id)
                 dbhashpassword = cursor.fetchone()
                 #db hash password is also a unicode tuple
                 
-                if typedhashpassword == map(str,dbhashpassword)[0]:
+                if typedhashpassword == dbhashpassword[0]:
                     cursor.execute("UPDATE users SET last_login=%s WHERE ID=%s",(today, id[0]))
                     return JsonResponse({'match':'true'})
                 else:
@@ -48,5 +51,5 @@ def index(request):
                     return JsonResponse({'match':'false'})
 
             except Exception as e:
-                return JsonResponse({'match - exc':str(e)})
+                return JsonResponse({'match - exc':str(traceback.format_exc())}, status=500)
     return JsonResponse({'match - no cursor':'false'})

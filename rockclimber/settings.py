@@ -11,18 +11,15 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
 import os
-import keyring
-import getpass
 from secret_settings import *
 
 database_name = 'RockClimber'
 username = 'RockClimber'
-password = keyring.get_password(database_name, username)
 
-while password == None :
-    password = getpass.getpass(database_name + " Password:\n")
-    # store the password
-    keyring.set_password(database_name, username, password)
+from python_mysql_dbconfig import read_db_config
+
+password = read_db_config()
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -132,3 +129,5 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join( BASE_DIR, "static/")
+
