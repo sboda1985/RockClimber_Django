@@ -12,11 +12,11 @@ def index(request):
     if request.method == 'POST':
         with connection.cursor() as cursor:
             try:
-                email = request.POST['email']
-                cursor.execute("SELECT COUNT(*) FROM users WHERE email = %s ", email)
+                email = str(request.POST['email'])
+                cursor.execute("SELECT COUNT(*) FROM users WHERE email = %s ", [email])
                 nr = cursor.fetchone()
                 #check if the email is still available	
-                if (map(str, nr)[0]!='0'):
+                if nr[0]!=0:
                     return JsonResponse({'email':'already taken'})
                 #get the max current ID
                 cursor.execute("SELECT MAX( ID ) FROM users WHERE 1") 
@@ -36,13 +36,15 @@ def index(request):
                 cursor.execute("""INSERT INTO `users`(`ID`, `username`, `realname`, `email`, `last_login`, `account_creation`, `account_active`) VALUES (%s,%s,%s,%s,%s,%s,%s)""", (id, username, realname, email, login, today, "1"))	
                 #generate salt from email and a random number	
                 rd = random.getrandbits(128)
-                salt = hashlib.sha512(email + str(rd)).hexdigest()
+                hemail = email + str(rd)
+                salt = hashlib.sha512(hemail.encode()).hexdigest()
                 #get the current password and salt it
                 typpass = request.POST['password']
                 #print typpass
-                password = hashlib.sha512(typpass + salt).hexdigest()
+                hpass = typpass + salt
+                password = hashlib.sha512(hpass.encode()).hexdigest()
                 #add the password and salt
-                cursor.execute(""" INSERT INTO `users_password`(`ID`, `password`, `salt`, `password_date`) VALUES (%s,%s,%s,%s)""",(id, password, salt, today))
+                cursor.execute(""" INSERT INTO `users_password`(`ID`, `password`, `salt`, `password_date`, `pin`) VALUES (%s,%s,%s,%s,%s)""",(id, password, salt, today, 0))
                 cursor.close()
                 return JsonResponse({'create':'success'})
                     
