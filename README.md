@@ -8,11 +8,36 @@ entering the appropiate module, like:  https://bodaszilard.hopto.org/rockclimber
 <br/><br/>
 The following modules are done now:<br/>
 
+    addroute
     addwall
     checklogin
     forgotpassword
     registration
     resetpasswordwithpin
+
+## addroute
+<br/><br/>
+Adds a route to the database to a specific wall<br/>
+<br/>
+URL: https://bodaszilard.hopto.org/rockclimber/addroute/<br/>
+Request: POST<br/>
+Parameters:<br/>
+user_id - the id of the user<br/>
+pin - the pin of the logged in user<br/>
+wall - the name of the wall in which the route is situated<br/>
+latitude - <br/>
+longitude - <br/>
+grading_system - <br/>
+difficulty - <br/>
+length - <br/>
+length_unit - <br/>
+note<br/>
+<br/><br/>
+Output:<br/>
+"route":"added" - if the adding was successfull<br/>
+"route":"exists" - if there is a route with a matching name in that wall<br/>
+"wall":"does not exists" - if such wall does not exists<br/>
+
 
 ## addwall
 <br/><br/>
