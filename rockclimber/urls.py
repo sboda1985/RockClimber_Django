@@ -21,5 +21,7 @@ urlpatterns = [
     url(r'^registration/', include('registration.urls')),
     url(r'^forgotpassword/', include('forgotpassword.urls')),
     url(r'^resetpasswordwithpin/', include('resetpasswordwithpin.urls')),
-    url(r'^admin/', admin.site.urls),
+    url(r'^addwall/', include('addwall.urls')),
+
+    # url(r'^admin/', admin.site.urls),
 ]
