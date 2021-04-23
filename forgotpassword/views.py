@@ -20,18 +20,18 @@ def index(request):
         with connection.cursor() as cursor:
             try:
                 email = request.POST['email']
-                cursor.execute("SELECT COUNT(*) FROM users WHERE email = %s ", email)
+                cursor.execute("SELECT COUNT(*) FROM users WHERE email = %s ", [email])
                 nr = cursor.fetchone()
                 #check if the email is registered
-                if (map(str, nr)[0]!='1'):
+                if  nr[0]!=1:
                     return JsonResponse({'email':'not registered'})
                 generatepin(email)
-                cursor.execute("SELECT pin FROM users_password JOIN users WHERE users.ID = users_password.ID AND users.email = %s", email)
+                cursor.execute("SELECT pin FROM users_password JOIN users WHERE users.ID = users_password.ID AND users.email = %s", [email])
                 pin = cursor.fetchone()
-                cursor.execute("SELECT ID FROM users WHERE email = %s",email)
-                id = map(str, cursor.fetchone())[0]
+                cursor.execute("SELECT ID FROM users WHERE email = %s",[email])
+                id = cursor.fetchone()[0]
                 body = """Please enter the following PIN to reset your Password \n  \n """
-                body = body + map(str,pin)[0]
+                body = body + pin[0]
                 body = body + "\n"
                 send_mail(
                         'RC - reset link',
@@ -44,5 +44,5 @@ def index(request):
                 return JsonResponse({'forgot':'reset email sent', 'id':id})
 
             except:
-                traceback.print_exc(file=sys.stdout)
-                return JsonResponse({'exc':'error'})
+                return JsonResponse({'match - exc':str(traceback.format_exc())}, status=500)
+
