@@ -22,6 +22,7 @@ urlpatterns = [
     url(r'^forgotpassword/', include('forgotpassword.urls')),
     url(r'^resetpasswordwithpin/', include('resetpasswordwithpin.urls')),
     url(r'^addwall/', include('addwall.urls')),
+    url(r'^addroute/', include('addroute.urls')),
 
     # url(r'^admin/', admin.site.urls),
 ]
