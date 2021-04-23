@@ -7,12 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 import time
 from django.core.mail import send_mail
-import random
-
-def generatepin(email):
- cursor = connection.cursor()
- pin = random.randint(1000000, 10000000)  
- cursor.execute("""UPDATE `users_password` JOIN users SET pin=%s WHERE users.ID = users_password.ID AND users.email = %s""",(pin, email)) 
+import functions
 
 @csrf_exempt
 def index(request):
@@ -25,7 +20,7 @@ def index(request):
                 #check if the email is registered
                 if  nr[0]!=1:
                     return JsonResponse({'email':'not registered'})
-                generatepin(email)
+                functions.generatepin(email)
                 cursor.execute("SELECT pin FROM users_password JOIN users WHERE users.ID = users_password.ID AND users.email = %s", [email])
                 pin = cursor.fetchone()
                 cursor.execute("SELECT ID FROM users WHERE email = %s",[email])
